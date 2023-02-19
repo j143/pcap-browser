@@ -37,20 +37,31 @@ class FileForm(FlaskForm):
 def home():
     return render_template('home.html')
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return "No file uploaded"
+# @app.route('/upload', methods=['POST'])
+# def upload_file():
+#     if 'file' not in request.files:
+#         return "No file uploaded"
+#
+#     file = request.files['file']
+#     if file.filename == '':
+#         return "No file selected"
+#
+#     # save the file
+#     filename = secure_filename(app.config.filename)
+#     # file.save(filename)
+#     file.save(filename)
+#
+#     return "File uploaded successfully"
 
-    file = request.files['file']
-    if file.filename == '':
-        return "No file selected"
-
-    # save the file
-    filename = secure_filename(file.filename)
-    file.save(filename)
-
-    return "File uploaded successfully"
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    if request.method == 'POST' and 'file' in request.files:
+        filename = files.save(request.files['file'])
+        file = File(name=request.files['file'].filename, path=filename, file_type=request.files['file'].content_type)
+        db.session.add(file)
+        db.session.commit()
+        return redirect(url_for('browse'))
+    return render_template('upload.html')
 
 
 @app.route('/browse', methods=['GET', 'POST'])
