@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+  <h1>Welcome to the File Browser!</h1>
+  <p>Use the navigation bar to browse and upload files.</p>
+
+    <section class="py-5 text-center">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <h2>Upload a File</h2>
+        <p class="lead mb-5">Select a file from your computer to upload to the server.</p>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+          <div class="form-group">
+            <input type="file" class="form-control-file" name="file">
+          </div>
+          <button type="submit" class="btn btn-primary">Upload File</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

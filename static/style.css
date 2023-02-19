@@ -1,0 +1,65 @@
+/* Bootstrap overrides */
+.form-control {
+  margin-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.card {
+  border: none;
+}
+
+.card-footer {
+  background-color: white;
+}
+
+/* Custom styles */
+body {
+  padding-top: 70px;
+}
+
+.btn-file {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-file input[type="file"] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 100px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  outline: none;
+  background: white;
+  cursor: inherit;
+  display: block;
+}
+
+.card-img-top {
+  height: 180px;
+  object-fit: contain;
+}
+
+.card-text {
+  height: 120px;
+  overflow: auto;
+}
+
+.navbar-brand {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.navbar-collapse {
+  justify-content: flex-end;
+}
+
+.active-link {
+  font-weight: bold;
+}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse{% endblock %}
+
+{% block content %}
+  <h1>Browse Files</h1>
+    {% extends 'base.html' %}
+
+{% block content %}
+  <h1>Browse Files</h1>
+  <form method="POST" action="{{ url_for('browse') }}" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+      {{ form.file(class="form-control-file") }}
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+{% endblock %}
+
+  <form method="post" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    <div class="form-group">
+      {{ form.file(class="form-control-file") }}
+      {% if form.file.errors %}
+        <small class="form-text text-danger">{{ form.file.errors[0] }}</small>
+      {% endif %}
+    </div>
+    <div class="form-group">
+      {{ form.file_type.label(class="form-control-label") }}
+      {{ form.file_type(class="form-control") }}
+      {% if form.file_type.errors %}
+        <small class="form-text text-danger">{{ form.file_type.errors[0] }}</small>
+      {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+  <hr>
+  <div class="form-group">
+    <a href="{{ url_for('browse') }}">All</a> |
+    <a href="{{ url_for('browse', type='pdf') }}">PDFs</a> |
+    <a href="{{ url_for('browse', type='image') }}">Images</a> |
+    <a href="{{ url_for('browse', type='text') }}">Text</a>
+  </div>
+  <hr>
+  <div class="row">
+    {% for file in files %}
+      <div class="col-md-3 mb-3">
+        <div class="card">
+          {% if file.type == 'pdf' %}
+            <img class="card-img-top" src="{{ url_for('static', filename='img/pdf-icon.png') }}">
+          {% elif file.type == 'image' %}
+            <img class="card-img-top" src="{{ url_for('uploaded_file', filename=file.filename) }}">
+          {% elif file.type == 'text' %}
+            <div class="card-body">
+              <h5 class="card-title">{{ file.filename }}</h5>
+              <p class="card-text">{{ file.content }}</p>
+            </div>
+          {% endif %}
+          <div class="card-footer">
+            <small class="text-muted">{{ file.filename }}</small>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
