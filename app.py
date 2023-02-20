@@ -10,6 +10,8 @@ import pyshark
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 
+import threading
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
@@ -67,6 +69,7 @@ def upload():
 @app.route('/browse', methods=['GET', 'POST'])
 def browse(files=None):
     form = FileForm()
+    print('here_iam in the first app.route')
     if form.validate_on_submit():
         filename = files.save(request.files['file'])
         file_type = form.file_type.data.lower()
@@ -81,26 +84,36 @@ def browse(files=None):
         files = File.query.all()
     return render_template('browse.html', files=files, form=form, file_type=file_type)
 
-@app.route('/browse')
-def view_file():
-    id = request.args.get('file_id')
-    file = File.query.get_or_404(id)
+@app.route('/browse/<int:file_id>')
+def view_file(file_id):
+    # id = request.args.get('file_id')
+    print(f"id={file_id}")
+    file = File.query.get_or_404(file_id)
     if 1:
     # if file.file_type == 'application/vnd.tcpdump.pcap':
         # Extract packet details from pcap file
-        capture = pyshark.FileCapture(file.path)
-        packets = []
-        for packet in capture:
-            packets.append({
-                'protocol': packet.highest_layer,
-                'source': packet.ip.src,
-                'destination': packet.ip.dst,
-                'timestamp': packet.sniff_time
-            })
-        capture.close()
-        return render_template('view_pcap.html', file=file, packets=packets)
+        thread = threading.Thread(target=run_capture, args=(file.path))
+        thread.start()
+
+        return render_template('view_pcap.html', file=file)
     else:
         return render_template('view_file.html', file=file)
+
+def run_capture(file_path):
+    capture = pyshark.FileCapture(file_path)
+    packets = []
+    for packet in capture:
+        print(f'packets: {packet.highest_layer}')
+        packets.append({
+            'protocol': packet.highest_layer,
+            'source': packet.ip.src,
+            'destination': packet.ip.dst,
+            'timestamp': packet.sniff_time
+        })
+    capture.close()
+    file = File.query.filter_by(path=file_path).first()
+    file.packets = packets
+    db.session.commit()
 
 if __name__ == '__main__':
     db.create_all()
