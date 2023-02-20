@@ -1,10 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>{{ file.name }}</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {% if file.file_type == 'pcap' %}
+        <p>This file is a PCAP file. <a href="{{ url_for('view_pcap', file_id=file.id) }}">View packet details.</a></p>
+        {% else %}
+        <p>This file is of type "{{ file.file_type }}".</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

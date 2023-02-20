@@ -14,7 +14,7 @@
     <h2>Uploaded Files</h2>
     <ul>
       {% for file in files %}
-        <li><a href="{{ url_for('browse', file_id=file.id) }}">{{ file.name }}</a></li>
+        <li><a href="{{ url_for('browse', id=file.id)}}">{{ file.name }}</a></li>
 
       {% endfor %}
     </ul>

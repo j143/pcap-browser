@@ -1,10 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>Packet Details</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Packet No.</th>
+                        <th>Source</th>
+                        <th>Destination</th>
+                        <th>Protocol</th>
+                        <th>Length</th>
+                        <th>Info</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for packet in packets %}
+                    <tr>
+                        <td>{{ packet.no }}</td>
+                        <td>{{ packet.source }}</td>
+                        <td>{{ packet.destination }}</td>
+                        <td>{{ packet.protocol }}</td>
+                        <td>{{ packet.length }}</td>
+                        <td>{{ packet.info }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
