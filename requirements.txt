@@ -4,3 +4,4 @@ flask-wtf
 flask-SQLAlchemy
 pyshark
 Flask-Reuploaded
+Flask-Migrate
