@@ -18,6 +18,7 @@ app.config['SECRET_KEY'] = 'secret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///files.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOADED_FILES_DEST'] = 'uploads'
+app.config['TSHARK_PATH'] = 'D:/programs/Wireshark/tshark.exe'
 
 db = SQLAlchemy(app)
 
@@ -108,7 +109,10 @@ def view_file(file_id):
 def run_capture(file_path):
     print("I am inside run_capture method")
     asyncio.set_event_loop(asyncio.new_event_loop())
-    capture = pyshark.FileCapture(file_path)
+    print(f'filepath={file_path}')
+    file_path = os.path.join(app.config['UPLOADED_FILES_DEST'], file_path)
+    custom_tshark_path = app.config['TSHARK_PATH']
+    capture = pyshark.FileCapture(file_path, tshark_path=custom_tshark_path)
     packets = []
     for packet in capture:
         print(f'packets: {packet.highest_layer}')
