@@ -31,6 +31,10 @@ class File(db.Model):
     name = db.Column(db.String(255))
     path = db.Column(db.String(255))
     file_type = db.Column(db.String(50))
+    packets = db.Column(db.JSON)
+
+    def __repr__(self):
+        return f"<File {self.id}>"
 
 
 class FileForm(FlaskForm):
@@ -135,7 +139,7 @@ def view_file(file_id):
         if hasattr(file, 'packets'):
             return render_template('view_pcap.html', file=file, packets=file.packets)
         else:
-            pass
+            return
     else:
         return render_template('view_file.html', file=file)
 
