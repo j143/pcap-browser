@@ -106,26 +106,29 @@ def view_file(file_id):
         return render_template('view_file.html', file=file)
 
 
-def run_capture(file_path):
+def run_capture(file_name):
     print("I am inside run_capture method")
     asyncio.set_event_loop(asyncio.new_event_loop())
-    print(f'filepath={file_path}')
-    file_path = os.path.join(app.config['UPLOADED_FILES_DEST'], file_path)
+    print(f'filepath={file_name}')
+    file_path = os.path.join(app.config['UPLOADED_FILES_DEST'], file_name)
     custom_tshark_path = app.config['TSHARK_PATH']
-    capture = pyshark.FileCapture(file_path, tshark_path=custom_tshark_path)
-    packets = []
-    for packet in capture:
-        print(f'packets: {packet.highest_layer}')
-        packets.append({
-            'protocol': packet.highest_layer,
-            'source': packet.ip.src,
-            'destination': packet.ip.dst,
-            'timestamp': packet.sniff_time
-        })
-    capture.close()
-    file = File.query.filter_by(path=file_path).first()
-    file.packets = packets
-    db.session.commit()
+    with app.app_context():
+        capture = pyshark.FileCapture(file_path, tshark_path=custom_tshark_path)
+        packets = []
+        for packet in capture:
+            packets.append({
+                'protocol': packet.highest_layer,
+                # 'source': packet.ip.src,
+                # 'destination': packet.ip.dst,
+                'timestamp': packet.sniff_time
+            })
+        capture.close()
+        print("capture is closed")
+        file = File.query.filter_by(path=file_name).first()
+        file.packets = packets
+        print("file packets are found")
+        db.session.commit()
+        print("I did commit to db session")
 
 
 if __name__ == '__main__':
