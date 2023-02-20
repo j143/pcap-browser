@@ -89,23 +89,6 @@ def browse(files=None):
         files = File.query.all()
     return render_template('browse.html', files=files, form=form, file_type=file_type)
 
-
-@app.route('/browse/<int:file_id>')
-def view_file(file_id):
-    # id = request.args.get('file_id')
-    print(f"id={file_id}")
-    file = File.query.get_or_404(file_id)
-    if 1:
-        # if file.file_type == 'application/vnd.tcpdump.pcap':
-        # Extract packet details from pcap file
-        thread = threading.Thread(target=run_capture, args=(file.path,))
-        thread.start()
-
-        return render_template('view_pcap.html', file=file)
-    else:
-        return render_template('view_file.html', file=file)
-
-
 def run_capture(file_name):
     print("I am inside run_capture method")
     asyncio.set_event_loop(asyncio.new_event_loop())
@@ -129,6 +112,32 @@ def run_capture(file_name):
         print("file packets are found")
         db.session.commit()
         print("I did commit to db session")
+        print(f"Number of packets extracted: {len(packets)}")
+
+        return
+
+
+@app.route('/browse/<int:file_id>')
+def view_file(file_id):
+    # id = request.args.get('file_id')
+    print(f"id={file_id}")
+    file = File.query.get_or_404(file_id)
+    if 1:
+        # if file.file_type == 'application/vnd.tcpdump.pcap':
+        # Extract packet details from pcap file
+        thread = threading.Thread(target=run_capture, args=(file.path,))
+        thread.start()
+        thread.join() # wait for running the run_capture method
+
+        # Fetch the File object from the database again to get the updated packets
+        file = File.query.filter_by(path=file.path).first()
+
+        if hasattr(file, 'packets'):
+            return render_template('view_pcap.html', file=file, packets=file.packets)
+        else:
+            pass
+    else:
+        return render_template('view_file.html', file=file)
 
 
 if __name__ == '__main__':
