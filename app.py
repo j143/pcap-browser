@@ -81,10 +81,12 @@ def browse(files=None):
         files = File.query.all()
     return render_template('browse.html', files=files, form=form, file_type=file_type)
 
-@app.route('/browse/<int:id>')
-def view_file(id):
+@app.route('/browse')
+def view_file():
+    id = request.args.get('file_id')
     file = File.query.get_or_404(id)
-    if file.file_type == 'pcap':
+    if 1:
+    # if file.file_type == 'application/vnd.tcpdump.pcap':
         # Extract packet details from pcap file
         capture = pyshark.FileCapture(file.path)
         packets = []
