@@ -13,6 +13,9 @@ from werkzeug.utils import secure_filename
 import threading
 import asyncio
 
+import json
+from datetime import datetime
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///files.db'
@@ -25,6 +28,15 @@ db = SQLAlchemy(app)
 files = UploadSet('files', ALL)
 configure_uploads(app, files)
 
+# # Assume that packets is a list of dictionaries with timestamp keys as datetime objects
+# packets = [{'protocol': 'ARP', 'source': '10.69.97.124', 'destination': '10.69.97.124', 'timestamp': datetime.now()}]
+
+# Convert datetime objects to string representations
+# for packet in packets:
+#     packet['timestamp'] = packet['timestamp'].isoformat()
+
+# Serialize to JSON
+# json_data = json.dumps({'packets': packets})
 
 class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -101,18 +113,39 @@ def run_capture(file_name):
     custom_tshark_path = app.config['TSHARK_PATH']
     with app.app_context():
         capture = pyshark.FileCapture(file_path, tshark_path=custom_tshark_path)
+        # packets = [{'protocol': 'ARP', 'source': '10.69.97.124', 'destination': '10.69.97.124', 'timestamp': datetime.now()}]
         packets = []
         for packet in capture:
-            packets.append({
-                'protocol': packet.highest_layer,
-                # 'source': packet.ip.src,
-                # 'destination': packet.ip.dst,
-                'timestamp': packet.sniff_time
-            })
+
+            packet_dict = {'protocol': packet.highest_layer, 'timestamp': packet.sniff_time.isoformat()}
+
+            if packet.highest_layer == 'ARP':
+                packet_dict['source'] = packet.arp.src_proto_ipv4
+                packet_dict['destination'] = packet.arp.dst_proto_ipv4
+
+            elif packet.highest_layer == 'IP':
+                packet_dict['source'] = packet.ip.src
+                packet_dict['destination'] = packet.ip.dst
+
+            elif packet.highest_layer == 'IPv6':
+                packet_dict['source'] = packet.ipv6.src
+                packet_dict['destination'] = packet.ipv6.dst
+
+            elif packet.highest_layer == 'TCP':
+                packet_dict['source'] = f"{packet.ip.src}:{packet.tcp.srcport}"
+                packet_dict['destination'] = f"{packet.ip.dst}:{packet.tcp.dstport}"
+
+            elif packet.highest_layer == 'UDP':
+                packet_dict['source'] = f"{packet.ip.src}:{packet.udp.srcport}"
+                packet_dict['destination'] = f"{packet.ip.dst}:{packet.udp.dstport}"
+
+            packets.append(packet_dict)
+
         capture.close()
         print("capture is closed")
         file = File.query.filter_by(path=file_name).first()
-        file.packets = packets
+        json_data = json.dumps({'packets': packets})
+        file.packets = json_data
         print("file packets are found")
         db.session.commit()
         print("I did commit to db session")
@@ -120,6 +153,12 @@ def run_capture(file_name):
 
         return
 
+# # Convert datetime objects to string representations
+# for packet in packets:
+#     packet['timestamp'] = packet['timestamp'].isoformat()
+#
+# # Serialize to JSON
+# json_data = json.dumps({'packets': packets})
 
 @app.route('/browse/<int:file_id>')
 def view_file(file_id):

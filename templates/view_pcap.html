@@ -15,6 +15,7 @@
                 <thead>
                     <tr>
                         <th>Packet No.</th>
+                        <th>Timestamp</th>
                         <th>Source</th>
                         <th>Destination</th>
                         <th>Protocol</th>
@@ -26,6 +27,7 @@
                     {% for packet in packets %}
                     <tr>
                         <td>{{ packet.no }}</td>
+                        <td>{{ packet.timestamp }}</td>
                         <td>{{ packet.source }}</td>
                         <td>{{ packet.destination }}</td>
                         <td>{{ packet.protocol }}</td>
