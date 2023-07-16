@@ -7,6 +7,20 @@ from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 import pyshark
 
+# for tshark path
+import platform
+import configparser
+
+config = configparser.ConfigParser()
+config.read('app.config')
+
+# Get the current platform
+current_platform = platform.system()
+
+# Retrieve the corresponding value based on the platform
+tshark_path = config.get(current_platform, 'TSHARK_PATH')
+
+
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 
@@ -21,7 +35,7 @@ app.config['SECRET_KEY'] = 'secret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///files.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOADED_FILES_DEST'] = 'uploads'
-app.config['TSHARK_PATH'] = 'D:/programs/Wireshark/tshark.exe'
+# app.config['TSHARK_PATH'] = 'D:/programs/Wireshark/tshark.exe'
 
 db = SQLAlchemy(app)
 
@@ -182,7 +196,8 @@ def view_file(file_id):
     else:
         return render_template('view_file.html', file=file)
 
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
-    db.create_all()
     app.run(debug=True)
