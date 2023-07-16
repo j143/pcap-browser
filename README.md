@@ -3,6 +3,23 @@
 This is an experimental project to view pcaps in the browser with tshark from a server.
 This is a starter project, and works for small pcap files.
 
+## Start
+
+1. Install pip dependencies
+
+```sh
+pip install -r requirements.txt
+
+```
+
+2. start the app
+
+```sh
+python app.py
+```
+
+
+
 ## Images
 
 file upload view
