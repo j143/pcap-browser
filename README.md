@@ -3,6 +3,14 @@
 This is an experimental project to view pcaps in the browser with tshark from a server.
 This is a starter project, and works for small pcap files.
 
+## Images
+
+file upload view
+
+![upload view](./static/images/pcap-browser-file-upload.png)
+
+
+
 ## Dependencies
 
 The following dependencies are required for this tool installation.

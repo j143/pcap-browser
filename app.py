@@ -73,23 +73,6 @@ class FileForm(FlaskForm):
 def home():
     return render_template('home.html')
 
-
-# @app.route('/upload', methods=['POST'])
-# def upload_file():
-#     if 'file' not in request.files:
-#         return "No file uploaded"
-#
-#     file = request.files['file']
-#     if file.filename == '':
-#         return "No file selected"
-#
-#     # save the file
-#     filename = secure_filename(app.config.filename)
-#     # file.save(filename)
-#     file.save(filename)
-#
-#     return "File uploaded successfully"
-
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST' and 'file' in request.files:
@@ -167,12 +150,6 @@ def run_capture(file_name):
 
         return
 
-# # Convert datetime objects to string representations
-# for packet in packets:
-#     packet['timestamp'] = packet['timestamp'].isoformat()
-#
-# # Serialize to JSON
-# json_data = json.dumps({'packets': packets})
 
 @app.route('/browse/<int:file_id>')
 def view_file(file_id):
